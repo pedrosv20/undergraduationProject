@@ -1,4 +1,6 @@
 from sklearn.datasets import fetch_20newsgroups
+from sentence_transformers import SentenceTransformer
+from datetime import datetime
 import numpy as np
 import river
 import pandas as pd
@@ -6,6 +8,7 @@ import sys
 import os
 import re
 import ssl
+import time
 
 try:
     _create_unverified_https_context = ssl._create_unverified_context
@@ -16,9 +19,34 @@ else:
     # Handle target environment that doesn't support HTTPS verification
     ssl._create_default_https_context = _create_unverified_https_context
 
-class HashingTrickTey():
 
-    def __init__(self, hashRange: int = 50):
+class BertEy:
+    def __init__(self):
+        self = self
+
+    def transform_many(self, sentences):
+        data = {}
+        indexes = []
+        columns = [x for x in range(384)]
+        for index, sentence in enumerate(sentences):
+            data[index] = self.transform_one(sentence)
+            indexes.append(index)
+
+        return pd.DataFrame(data=data.values(),
+                            columns=columns, index=indexes)
+
+    def transform_one(self, document):
+        model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
+        sentence_embedding = model.encode(document)
+        teste = {}
+        for count, value in enumerate([embed for embed in sentence_embedding]):
+            teste[count] = value
+        return teste
+
+
+class HashingTrickTey:
+
+    def __init__(self, hashRange: int = 500):
         self.hashRange = hashRange
 
     def createHashMatrix(self, corpus: [str]):
@@ -36,10 +64,10 @@ class HashingTrickTey():
         for i in range(self.hashRange):
             documentDict[i] = 0
 
-        print(document)
+        # print(document)
         document = document.lower()
         words = re.compile(r"(?u)\b\w\w+\b").findall(document)
-        print(document)
+        # print(document)
         # words = words.lower()
 
         for word in words:
@@ -76,7 +104,7 @@ def loadDatasetTey(env = "SMSSpam"):
 
         X = pd.DataFrame({"text": newsgroups.data,
                           "target": newsgroups.target})
-        print(X.info)
+        # print(X.info)
 
         y = X.pop("target")
 
@@ -85,18 +113,22 @@ def loadDatasetTey(env = "SMSSpam"):
     else:
         print("please enter valid dataset name")
 
-
+print(datetime.today().strftime('%Y-%m-%d-%H:%M:%S'))
 dataset = loadDatasetTey(env = "SMSSpam")
-print(dataset)
-
+# print(dataset)
+#
 # Feature extractors
 ht = HashingTrickTey()
 
 bow = river.feature_extraction.BagOfWords()
 
-model = river.naive_bayes.MultinomialNB()
+modelHT = river.naive_bayes.GaussianNB()
+modelBert = river.naive_bayes.GaussianNB()
 
-metric = river.metrics.Accuracy()
+metricHT = river.metrics.Accuracy()
+metricBert = river.metrics.Accuracy()
+
+bertey = BertEy()
 
 
 
@@ -108,16 +140,29 @@ if not hashseed:
     
 
 for x, y in dataset:
-    
-    hashingTrick = ht.transform_one(document=x[list(x.keys())[0]])
 
-    probs = model.predict_proba_one(hashingTrick)
+    hashingTrick = ht.transform_one(document=x[list(x.keys())[0]])
+    probs = modelHT.predict_proba_one(hashingTrick)
     if len(probs) > 0:
         y_pred = max(probs, key=lambda k: probs[k])
     else:
         y_pred = 0
-    
-    model.learn_one(hashingTrick, y)
-    metric.update(y, y_pred)
 
-print(metric)
+    modelHT.learn_one(hashingTrick, y)
+    metricHT.update(y, y_pred)
+
+print("metricht", metricHT)
+
+for x, y in dataset:
+    berrrt = bertey.transform_one(document=x[list(x.keys())[0]])
+    probs = modelBert.predict_proba_one(berrrt)
+    if len(probs) > 0:
+        y_pred = max(probs, key=lambda k: probs[k])
+    else:
+        y_pred = 0
+
+    modelBert.learn_one(berrrt, y)
+    metricBert.update(y, y_pred)
+
+print("metricbert", metricBert)
+print(datetime.today().strftime('%Y-%m-%d-%H:%M:%S'))
