@@ -9,6 +9,9 @@ import os
 import re
 import ssl
 import time
+from gensim.test.utils import common_texts, get_tmpfile
+from gensim.models import Word2Vec
+from datetime import datetime
 
 try:
     _create_unverified_https_context = ssl._create_unverified_context
@@ -18,6 +21,49 @@ except AttributeError:
 else:
     # Handle target environment that doesn't support HTTPS verification
     ssl._create_default_https_context = _create_unverified_https_context
+
+
+
+
+class Word2VecTey:
+    def __init__(self, size=100):
+        self.size = size
+
+    def transform_many(self, phrases):
+        dictTey = {}
+        indexes = []
+        columns = [x for x in range(self.size)]
+        for index, phrase in enumerate(phrases):
+            dictTey[index] = self.transform_one(phrase, self.size)
+            indexes.append(index)
+
+        return pd.DataFrame(data=dictTey.values(),
+                            columns=columns, index=indexes)
+
+    def transform_one(self, document):
+
+        dictToBeReturned = {}
+        splited = [document.split(" ") for i in range(2)]
+        model = Word2Vec(splited, vector_size=self.size, window=5, min_count=1, workers=4)
+
+        represent = None
+
+        for p in document.split(" "):
+            v = np.array(model.wv[p])
+            if represent is None:
+                represent = v
+            else:
+                represent = np.add(v, represent)
+
+        represent /= len(document.split(" "))
+
+        for count, value in enumerate([val for val in represent]):
+            dictToBeReturned[count] = value
+        return dictToBeReturned
+
+
+# teste = Word2VecTey()
+# teste.transform_many(["213 321 32", "123 eu sou eu sou maluquice meu irmao"])
 
 
 class BertEy:
@@ -119,16 +165,19 @@ dataset = loadDatasetTey(env = "SMSSpam")
 #
 # Feature extractors
 ht = HashingTrickTey()
+bertey = BertEy()
+word2Tey = Word2VecTey(size=100)
 
-bow = river.feature_extraction.BagOfWords()
 
 modelHT = river.naive_bayes.GaussianNB()
 modelBert = river.naive_bayes.GaussianNB()
+modelW2V = river.naive_bayes.GaussianNB()
 
 metricHT = river.metrics.Accuracy()
 metricBert = river.metrics.Accuracy()
+metricW2V = river.metrics.Accuracy()
 
-bertey = BertEy()
+
 
 
 
@@ -152,6 +201,19 @@ for x, y in dataset:
     metricHT.update(y, y_pred)
 
 print("metricht", metricHT)
+
+for x, y in dataset:
+    w2tey = word2Tey.transform_one(document=x[list(x.keys())[0]])
+    probs = modelW2V.predict_proba_one(w2tey)
+    if len(probs) > 0:
+        y_pred = max(probs, key=lambda k: probs[k])
+    else:
+        y_pred = 0
+
+    modelW2V.learn_one(w2tey, y)
+    metricW2V.update(y, y_pred)
+
+print("metricw2v", metricW2V)
 
 for x, y in dataset:
     berrrt = bertey.transform_one(document=x[list(x.keys())[0]])
