@@ -47,7 +47,7 @@ def testFeatureExtractor(featureExtractors, models, metrics, dataset):
     for i in range(len(featureExtractors)):
         for x, y in dataset:
             start = timer()
-            featureEx = featureExtractors[i].transform_one(document=x[list(x.keys())[0]])
+            featureEx = featureExtractors[i].transform_one(document=x[list(x.keys())[0]].lower())
             probs = models[i].predict_proba_one(featureEx)
             if len(probs) > 0:
                 y_pred = max(probs, key=lambda k: probs[k])
@@ -56,9 +56,11 @@ def testFeatureExtractor(featureExtractors, models, metrics, dataset):
 
             models[i].learn_one(featureEx, y)
             metrics[i].update(y, y_pred)
+            featureExtractors[i].fit(x[list(x.keys())[0]])
             end = timer()
+            #FIX TIME IN SECONDS
             dictTey[i] = [metrics[i], timedelta(seconds=end-start)]
     print(dictTey)
     return pd.DataFrame(data=dictTey.values(),
-                            columns=["accuracy", "time elapsed"], index=["hashingTrick","Word2Vec", "bert"])
+                            columns=["accuracy", "time elapsed"], index=["hashingTrick", "Word2Vec"])
 
