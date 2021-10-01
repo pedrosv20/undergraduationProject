@@ -22,4 +22,4 @@ metricW2V = river.metrics.Accuracy()
 
 dataset = loadDatasetTey(env = "SMSSpam")
 
-print(testFeatureExtractor([ht, word2Tey, bertey], [modelHT, modelW2V, modelBert], [metricHT, metricW2V, metricBert], dataset))
+print(testFeatureExtractor([ht, word2Tey], [modelHT, modelW2V], [metricHT, metricW2V], dataset))

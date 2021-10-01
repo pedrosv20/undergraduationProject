@@ -49,3 +49,5 @@ class HashingTrickTey:
                         for i in columns]
         return pd.DataFrame(data=data.values(),
                             columns=columns, index=matrix.keys())
+    def fit(self, document):
+        pass
