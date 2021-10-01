@@ -33,6 +33,12 @@ def loadDatasetTey(env="SMSSpam"):
 
         return river.stream.iter_pandas(X=X, y=y)
 
+    elif env == "yelp":
+        return river.stream.iter_csv("datasets/yelp_review_clean.csv", "stars")
+    
+    elif env == "twitter":
+        return river.stream.iter_csv("datasets/TwitterSentiment140.csv", "target")
+
     else:
         print("please enter valid dataset name")
 
@@ -47,7 +53,7 @@ def testFeatureExtractor(featureExtractors, models, metrics, dataset):
     for i in range(len(featureExtractors)):
         for x, y in dataset:
             start = timer()
-            featureEx = featureExtractors[i].transform_one(document=x[list(x.keys())[0]].lower())
+            featureEx = featureExtractors[i].transform_one(document=x.lower())
             probs = models[i].predict_proba_one(featureEx)
             if len(probs) > 0:
                 y_pred = max(probs, key=lambda k: probs[k])
