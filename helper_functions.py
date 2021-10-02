@@ -34,10 +34,10 @@ def loadDatasetTey(env="SMSSpam"):
         return river.stream.iter_pandas(X=X, y=y)
 
     elif env == "yelp":
-        return river.stream.iter_csv("datasets/yelp_review_clean.csv", "stars")
+        return river.stream.iter_csv("datasets/yelp_review_clean.csv", target="stars")
     
     elif env == "twitter":
-        return river.stream.iter_csv("datasets/TwitterSentiment140.csv", "target")
+        return river.stream.iter_csv("datasets/TwitterSentiment140.csv", target="target")
 
     else:
         print("please enter valid dataset name")
