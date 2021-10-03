@@ -6,6 +6,7 @@ from sklearn.datasets import fetch_20newsgroups
 from timeit import default_timer as timer
 from datetime import timedelta
 import ssl
+import re
 
 try:
     _create_unverified_https_context = ssl._create_unverified_context
@@ -48,25 +49,49 @@ if not hashseed:
     os.execv(sys.executable, [sys.executable] + sys.argv)
 
 
-def testFeatureExtractor(featureExtractors, models, metrics, dataset):
+def testFeatureExtractor(featureExtractors, models, metrics, data_stream_iterator):
     dictTey = {}
     for i in range(len(featureExtractors)):
-        for x, y in dataset:
-            start = timer()
-            featureEx = featureExtractors[i].transform_one(document=x.lower())
+        start = timer()
+        cont = 0
+        for instance, label in data_stream_iterator:
+            
+            # Retrieve instance's textual parameter
+            # It is expected the instance to be a dictionary and 
+            # the first parameter (and only one) to be a text
+            text_parameter = instance[list(instance.keys())[0]]
+
+            # Removes special characters from text
+            text_parameter = re.sub('\W+',' ', text_parameter)
+            
+            text_parameter = text_parameter.lower()
+
+            featureExtractors[i].fit(text_parameter)
+
+            featureEx = featureExtractors[i].transform_one(document=text_parameter)
             probs = models[i].predict_proba_one(featureEx)
+
             if len(probs) > 0:
                 y_pred = max(probs, key=lambda k: probs[k])
             else:
                 y_pred = 0
 
-            models[i].learn_one(featureEx, y)
-            metrics[i].update(y, y_pred)
-            featureExtractors[i].fit(x[list(x.keys())[0]])
-            end = timer()
-            #FIX TIME IN SECONDS
-            dictTey[i] = [metrics[i], timedelta(seconds=end-start)]
+            models[i].learn_one(featureEx, label)
+            metrics[i].update(label, y_pred)
+
+            if cont > 50:
+                break
+            else:
+                cont += 1
+            # Dataset iterator end
+
+        end = timer()
+        dictTey[i] = [metrics[i], timedelta(seconds=end-start)]
+
+        # Feature Extrators iterator end
+
     print(dictTey)
     return pd.DataFrame(data=dictTey.values(),
-                            columns=["accuracy", "time elapsed"], index=["hashingTrick", "Word2Vec"])
+                        columns=["accuracy", "time elapsed"],
+                        index=[type(i) for i in featureExtractors])#, index=["hashingTrick", "Word2Vec"])
 

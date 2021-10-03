@@ -5,11 +5,13 @@ import pandas as pd
 import numpy as np
 
 class Word2VecTey:
-    def __init__(self, size=100):
+    size: int
+    model: Word2Vec
 
+    def __init__(self, size=100):
         self.size = size
         #wiki-english-20171001
-        self.model = Word2Vec(sentences=gensim.downloader.load('text8'), vector_size=100, window=5, min_count=1, workers=4)
+        self.model = Word2Vec(sentences=common_texts, vector_size=100, window=5, min_count=1, workers=4)
 
     def transform_many(self, phrases):
         dictTey = {}
@@ -26,7 +28,7 @@ class Word2VecTey:
 
         dictToBeReturned = {}
 
-        self.fit(document)
+        # self.fit(document)
         represent = None
 
         for p in document.split(" "):
@@ -38,12 +40,21 @@ class Word2VecTey:
 
         represent /= len(document.split(" "))
 
-        for count, value in enumerate([val for val in represent]):
+        for count, value in enumerate(represent):
             dictToBeReturned[count] = value
         return dictToBeReturned
 
     def fit(self, document):
-        self.model.train(document, total_examples=len(document), epochs=1)
+        splited_document = document.split(" ")
 
-# teste = Word2VecTey()
-# teste.transform_many(["213 321 32", "123 eu sou eu sou maluquice meu irmao"])
+        # print("Mestora document:", splited_document,
+        #       "of size:", len(splited_document),
+        #       "of type:", type(splited_document))
+
+        # Based on below reference, train doesn't actually updates model's vocabullary
+        # https://stackoverflow.com/questions/55774197/gensims-word2vec-not-training-provided-documents
+
+        # Solved based on
+        # https://stackoverflow.com/questions/42357678/gensim-word2vec-array-dimensions-in-updating-with-online-word-embedding
+        self.model.build_vocab([splited_document], update=True)
+        self.model.train([splited_document], total_examples=1, epochs=1)
