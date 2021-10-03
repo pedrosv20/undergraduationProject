@@ -2,17 +2,16 @@ import river
 import pandas as pd
 import re
 
-
 class HashingTrickTey:
 
     def __init__(self, hashRange: int = 500):
         self.hashRange = hashRange
 
-    def createHashMatrix(self, corpus: list[str]):
+    def createHashMatrix(self, corpus):
         documentDict = {}
         count = 0
         for sentence in corpus:
-            words = self.transformOne(sentence)
+            words = self.transform_one(sentence)
             documentDict[count] = words
             count += 1
         return documentDict
@@ -33,7 +32,7 @@ class HashingTrickTey:
             documentDict[hash(word) % self.hashRange] += 1
         return documentDict
 
-    def transform_many(self, corpus: list[str]):
+    def transform_many(self, corpus):
         data = {}
         columns = []
         matrix = self.createHashMatrix(corpus)

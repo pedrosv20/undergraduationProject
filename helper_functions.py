@@ -41,6 +41,7 @@ def loadDatasetTey(env="SMSSpam"):
         return river.stream.iter_csv("datasets/TwitterSentiment140.csv", target="target")
 
     else:
+        exit()
         print("please enter valid dataset name")
 
 hashseed = os.getenv('PYTHONHASHSEED')
