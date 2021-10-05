@@ -35,10 +35,10 @@ def loadDatasetTey(env="SMSSpam"):
         return river.stream.iter_pandas(X=X, y=y)
 
     elif env == "yelp":
-        return river.stream.iter_csv("datasets/yelp_review_clean.csv", target="stars")
+        return river.stream.iter_csv("yelp_review_clean.csv", target="stars")
     
     elif env == "twitter":
-        return river.stream.iter_csv("datasets/TwitterSentiment140.csv", target="target")
+        return river.stream.iter_csv("TwitterSentiment140.csv", target="target")
 
     else:
         exit()
@@ -94,5 +94,5 @@ def testFeatureExtractor(featureExtractors, models, metrics, data_stream_iterato
     print(dictTey)
     return pd.DataFrame(data=dictTey.values(),
                         columns=["accuracy", "time elapsed"],
-                        index=[type(i) for i in featureExtractors])#, index=["hashingTrick", "Word2Vec"])
+                        index=[type(i) for i in featureExtractors])
 
