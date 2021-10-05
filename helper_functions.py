@@ -38,7 +38,7 @@ def loadDatasetTey(env="SMSSpam"):
         return river.stream.iter_csv("yelp_review_clean.csv", target="stars")
     
     elif env == "twitter":
-        return river.stream.iter_csv("TwitterSentiment140.csv", target="target")
+        return river.stream.iter_csv("TwitterSentiment140_Shuffled.csv", target="target")
 
     else:
         exit()
