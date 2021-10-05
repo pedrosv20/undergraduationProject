@@ -27,12 +27,20 @@ metricW2V = metrics.Accuracy()
 print("load dataset yelp")
 
 dataset = loadDatasetTey(env = "yelp")
-
+cache = stream.Cache()
 
 print("Hashing Trick")
-start = time.time()
 cont = 0
-for instance, label in dataset:
+for instance, label in cache(dataset, key="river_cache"):
+    # Timer is started here so the time for loading the
+    # dataset is not considered
+    if cont == 0:
+        cont += 1
+        start = time.time()
+
+    # Retrieve instance's textual parameter
+    # It is expected the instance to be a dictionary and 
+    # the first parameter (and only one) to be a text
     text_parameter = instance[list(instance.keys())[0]]
 
     # Removes special characters from text
@@ -53,16 +61,19 @@ for instance, label in dataset:
     modelHT.learn_one(extracted_features, label)
     metricHT.update(label, y_pred)
 
-    if cont > 500:
-        break
-    else:
-        cont += 1
-
 print("Hashing Trick",metricHT, "Time elapsed (s):", time.time() - start)
 
-start = time.time()
 cont = 0
-for instance, label in dataset:
+for instance, label in cache(dataset, key="river_cache"):
+    # We start timer here so the time for loading the
+    # dataset is not considered
+    if cont == 0:
+        cont += 1
+        start = time.time()
+
+    # Retrieve instance's textual parameter
+    # It is expected the instance to be a dictionary and 
+    # the first parameter (and only one) to be a text
     text_parameter = instance[list(instance.keys())[0]]
 
     # Removes special characters from text
@@ -83,16 +94,19 @@ for instance, label in dataset:
     modelW2V.learn_one(extracted_features, label)
     metricW2V.update(label, y_pred)
 
-    if cont > 500:
-        break
-    else:
-        cont += 1
-
 print("Word2Vec",metricW2V, "Time elapsed (s):", time.time() - start)
 
-start = time.time()
 cont = 0
-for instance, label in dataset:
+for instance, label in cache(dataset, key="river_cache"):
+    # We start timer here so the time for loading the
+    # dataset is not considered
+    if cont == 0:
+        cont += 1
+        start = time.time()
+
+    # Retrieve instance's textual parameter
+    # It is expected the instance to be a dictionary and 
+    # the first parameter (and only one) to be a text
     text_parameter = instance[list(instance.keys())[0]]
 
     # Removes special characters from text
@@ -113,9 +127,6 @@ for instance, label in dataset:
     modelBert.learn_one(extracted_features, label)
     metricBert.update(label, y_pred)
 
-    if cont > 500:
-        break
-    else:
-        cont += 1
-
 print("BERT", metricBert, "Time elapsed (s):", time.time() - start)
+
+cache.clear_all()

@@ -26,10 +26,20 @@ metricW2V = metrics.Accuracy()
 print("load dataset twitter")
 
 dataset = loadDatasetTey(env="twitter")
+cache = stream.Cache()
 
 print("Hashing Trick")
-start = time.time()
-for instance, label in dataset:
+cont = 0
+for instance, label in cache(dataset, key="river_cache"):
+    # We start timer here so the time for loading the
+    # dataset is not considered
+    if cont == 0:
+        cont += 1
+        start = time.time()
+
+    # Retrieve instance's textual parameter
+    # It is expected the instance to be a dictionary and 
+    # the first parameter (and only one) to be a text
     text_parameter = instance[list(instance.keys())[0]]
 
     # Removes special characters from text
@@ -52,8 +62,17 @@ for instance, label in dataset:
 
 print("Hashing Trick", metricHT, "Time elapsed (s):", time.time() - start)
 
-start = time.time()
-for instance, label in dataset:
+cont = 0
+for instance, label in cache(dataset, key="river_cache"):
+    # We start timer here so the time for loading the
+    # dataset is not considered
+    if cont == 0:
+        cont += 1
+        start = time.time()
+
+    # Retrieve instance's textual parameter
+    # It is expected the instance to be a dictionary and 
+    # the first parameter (and only one) to be a text
     text_parameter = instance[list(instance.keys())[0]]
 
     # Removes special characters from text
@@ -76,9 +95,17 @@ for instance, label in dataset:
 
 print("Word2Vec", metricW2V, "Time elapsed (s):", time.time() - start)
 
-start = time.time()
 cont = 0
-for instance, label in dataset:
+for instance, label in cache(dataset, key="river_cache"):
+    # We start timer here so the time for loading the
+    # dataset is not considered
+    if cont == 0:
+        cont += 1
+        start = time.time()
+
+    # Retrieve instance's textual parameter
+    # It is expected the instance to be a dictionary and 
+    # the first parameter (and only one) to be a text
     text_parameter = instance[list(instance.keys())[0]]
 
     # Removes special characters from text
@@ -100,3 +127,5 @@ for instance, label in dataset:
     metricBert.update(label, y_pred)
 
 print("BERT", metricBert, "Time elapsed (s):", time.time() - start)
+
+cache.clear_all()
