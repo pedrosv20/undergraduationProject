@@ -30,8 +30,9 @@ cache = stream.Cache()
 
 print("Hashing Trick")
 cont = 0
+start = 0
 for instance, label in cache(dataset, key="river_cache"):
-    # We start timer here so the time for loading the
+    # Timer is started ghere so the time for loading the
     # dataset is not considered
     if cont == 0:
         cont += 1
@@ -63,6 +64,7 @@ for instance, label in cache(dataset, key="river_cache"):
 print("Hashing Trick", metricHT, "Time elapsed (s):", time.time() - start)
 
 cont = 0
+start = 0
 for instance, label in cache(dataset, key="river_cache"):
     # We start timer here so the time for loading the
     # dataset is not considered
@@ -96,6 +98,7 @@ for instance, label in cache(dataset, key="river_cache"):
 print("Word2Vec", metricW2V, "Time elapsed (s):", time.time() - start)
 
 cont = 0
+start = 0
 for instance, label in cache(dataset, key="river_cache"):
     # We start timer here so the time for loading the
     # dataset is not considered
