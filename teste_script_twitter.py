@@ -4,9 +4,19 @@ from bert import BertEy
 from word2vec import Word2VecTey
 from hashing_trick import HashingTrickTey
 from river import naive_bayes, metrics, stream
-import pandas as pd
+import sys
 import re
 import time
+
+totalInstances = 0
+
+if "--totalInstances" in sys.argv:
+    argumentIndex = sys.argv.index("--totalInstances")
+    totalInstances = int(sys.argv[argumentIndex + 1])
+    print(totalInstances)
+if "-h" in sys.argv:
+    print("Usage: \n\t--totalInstances : sets the number of instaces to be used on testing")
+    exit()
 
 # Feature extractors
 ht = HashingTrickTey()
@@ -23,12 +33,12 @@ metricW2V = metrics.Accuracy()
 
 # print(testFeatureExtractor([ht, word2Tey], [modelHT, modelW2V], [m    etricHT, metricW2V], dataset))
 
-print("load dataset twitter")
+print("Start loading twitter dataset")
 
 dataset = loadDatasetTey(env="twitter")
 cache = stream.Cache()
 
-print("Hashing Trick")
+print("Starting test routine")
 cont = 0
 start = 0
 for instance, label in cache(dataset, key="river_cache"):
@@ -36,6 +46,7 @@ for instance, label in cache(dataset, key="river_cache"):
     # dataset is not considered
     if cont == 0:
         cont += 1
+        # print(instance)
         start = time.time()
 
     # Retrieve instance's textual parameter
@@ -61,7 +72,11 @@ for instance, label in cache(dataset, key="river_cache"):
     modelHT.learn_one(extracted_features, label)
     metricHT.update(label, y_pred)
 
-print("Hashing Trick", metricHT, "Time elapsed (s):", time.time() - start)
+    if totalInstances != 0 and cont > totalInstances:
+        break
+    cont += 1
+
+print("Hashing Trick", metricHT, "Time elapsed (sec):", time.time() - start)
 
 cont = 0
 start = 0
@@ -70,6 +85,7 @@ for instance, label in cache(dataset, key="river_cache"):
     # dataset is not considered
     if cont == 0:
         cont += 1
+        # print(instance)
         start = time.time()
 
     # Retrieve instance's textual parameter
@@ -95,6 +111,11 @@ for instance, label in cache(dataset, key="river_cache"):
     modelW2V.learn_one(extracted_features, label)
     metricW2V.update(label, y_pred)
 
+
+    if totalInstances != 0 and cont > totalInstances:
+        break
+    cont += 1
+
 print("Word2Vec", metricW2V, "Time elapsed (s):", time.time() - start)
 
 cont = 0
@@ -104,6 +125,7 @@ for instance, label in cache(dataset, key="river_cache"):
     # dataset is not considered
     if cont == 0:
         cont += 1
+        # print(instance)
         start = time.time()
 
     # Retrieve instance's textual parameter
@@ -128,6 +150,11 @@ for instance, label in cache(dataset, key="river_cache"):
 
     modelBert.learn_one(extracted_features, label)
     metricBert.update(label, y_pred)
+
+
+    if totalInstances != 0 and cont > totalInstances:
+        break
+    cont += 1
 
 print("BERT", metricBert, "Time elapsed (s):", time.time() - start)
 
