@@ -38,7 +38,7 @@ print("Start loading twitter dataset")
 dataset = loadDatasetTey(env="twitter")
 cache = stream.Cache()
 
-print("Starting test routine")
+print("Starting test routine for", totalInstances, "intances")
 cont = 0
 start = 0
 for instance, label in cache(dataset, key="river_cache"):
@@ -72,8 +72,11 @@ for instance, label in cache(dataset, key="river_cache"):
     modelHT.learn_one(extracted_features, label)
     metricHT.update(label, y_pred)
 
-    if totalInstances != 0 and cont > totalInstances:
-        break
+    if totalInstances != 0:
+        if cont > totalInstances:
+            break
+        if cont % (totalInstances/10) == 0:
+            print("\t", cont, "of", totalInstances, "instances processed")
     cont += 1
 
 print("Hashing Trick", metricHT, "Time elapsed (sec):", time.time() - start)
@@ -112,8 +115,11 @@ for instance, label in cache(dataset, key="river_cache"):
     metricW2V.update(label, y_pred)
 
 
-    if totalInstances != 0 and cont > totalInstances:
-        break
+    if totalInstances != 0:
+        if cont > totalInstances:
+            break
+        if cont % (totalInstances/10) == 0:
+            print("\t", cont, "of", totalInstances, "instances processed")
     cont += 1
 
 print("Word2Vec", metricW2V, "Time elapsed (s):", time.time() - start)
@@ -152,8 +158,11 @@ for instance, label in cache(dataset, key="river_cache"):
     metricBert.update(label, y_pred)
 
 
-    if totalInstances != 0 and cont > totalInstances:
-        break
+    if totalInstances != 0:
+        if cont > totalInstances:
+            break
+        if cont % (totalInstances/10) == 0:
+            print("\t", cont, "of", totalInstances, "instances processed")
     cont += 1
 
 print("BERT", metricBert, "Time elapsed (s):", time.time() - start)
