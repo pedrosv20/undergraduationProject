@@ -73,6 +73,8 @@ for instance, label in cache(dataset, key="river_cache"):
         if cont > totalInstances:
             break
         if cont % (totalInstances/10) == 0:
+            print("y_pred", y_pred, "label", label)
+            print("probs", probs)
             print("\t", cont, "of", totalInstances, "instances processed")
     cont += 1
 

@@ -63,6 +63,9 @@ for instance, label in cache(dataset, key="river_cache"):
     extracted_features = ht.transform_one(text_parameter)
 
     probs = modelHT.predict_proba_one(extracted_features)
+    
+    # {1: %, 2:%}
+    # {"4", "5"}
 
     if len(probs) > 0:
         y_pred = max(probs, key=lambda k: probs[k])
@@ -76,11 +79,14 @@ for instance, label in cache(dataset, key="river_cache"):
         if cont > totalInstances:
             break
         if cont % (totalInstances/10) == 0:
+            print("y_pred", y_pred, "label", label)
+            print("probs", probs)
             print("\t", cont, "of", totalInstances, "instances processed")
     cont += 1
 
 print("Hashing Trick", metricHT, "Time elapsed (sec):", time.time() - start)
 
+exit()
 cont = 0
 start = 0
 for instance, label in cache(dataset, key="river_cache"):
@@ -119,6 +125,7 @@ for instance, label in cache(dataset, key="river_cache"):
         if cont > totalInstances:
             break
         if cont % (totalInstances/10) == 0:
+            print("y_pred", y_pred, "label", label)
             print("\t", cont, "of", totalInstances, "instances processed")
     cont += 1
 
