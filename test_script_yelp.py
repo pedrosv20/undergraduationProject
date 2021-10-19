@@ -9,6 +9,7 @@ import time
 import sys
 
 totalInstances = 0
+cache_key = "yelp"
 
 if "--totalInstances" in sys.argv:
     argumentIndex = sys.argv.index("--totalInstances")
@@ -39,7 +40,7 @@ cache = stream.Cache()
 print("Starting test routine for", totalInstances, "intances")
 cont = 0
 start = 0
-for instance, label in cache(dataset, key="river_cache"):
+for instance, label in cache(dataset, key=cache_key):
     # Timer is started here so the time for loading the
     # dataset is not considered
     if cont == 0:
@@ -73,8 +74,8 @@ for instance, label in cache(dataset, key="river_cache"):
         if cont > totalInstances:
             break
         if cont % (totalInstances/10) == 0:
-            print("y_pred", y_pred, "label", label)
-            print("probs", probs)
+            # print("y_pred", y_pred, "label", label)
+            # print("probs", probs)
             print("\t", cont, "of", totalInstances, "instances processed")
     cont += 1
 
@@ -82,7 +83,7 @@ print("Hashing Trick",metricHT, "Time elapsed (sec):", time.time() - start)
 
 cont = 0
 start = 0
-for instance, label in cache(dataset, key="river_cache"):
+for instance, label in cache(dataset, key=cache_key):
     # We start timer here so the time for loading the
     # dataset is not considered
     if cont == 0:
@@ -124,7 +125,7 @@ print("Word2Vec",metricW2V, "Time elapsed (s):", time.time() - start)
 
 cont = 0
 start = 0
-for instance, label in cache(dataset, key="river_cache"):
+for instance, label in cache(dataset, key=cache_key):
     # We start timer here so the time for loading the
     # dataset is not considered
     if cont == 0:
